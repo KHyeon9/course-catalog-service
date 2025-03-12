@@ -1,6 +1,20 @@
 spring:
   application:
     name: course-catalog-service
+  # h2와 연결 셋팅
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true # kotlin 코드내의 entity를 스캔해 자동으로 테이블 생성
+    show-sql: true # 콘솔에서 sql문을 보여줌
+  h2:
+    console:
+      enabled: true # 브라우저를 통해 h2 컨트롤 가능하도록 설정
 message: Hello from default profile
 
 #---
