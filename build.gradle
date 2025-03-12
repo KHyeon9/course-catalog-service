@@ -20,21 +20,32 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
+	// web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// kotlin
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
+	// logging
+	implementation "io.github.microutils:kotlin-logging:3.0.5"
+
+	// db
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.h2database:h2'
 	// runtimeOnly 'org.postgresql:postgresql'
 
+	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// mock 관려
+	testImplementation 'io.mockk:mockk:1.13.17'
+	testImplementation 'com.ninja-squad:springmockk:4.0.2'
 }
 
 kotlin {
@@ -51,4 +62,10 @@ allOpen {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+sourceSets {
+	test {
+		java.setSrcDirs(["src/test/intg", "src/test/unit"])
+	}
 }
