@@ -27,4 +27,12 @@ class CourseService(
             CourseDto(it.id, it.name, it.category)
         }
     }
+
+    fun retrieveCourses(): List<CourseDto> {
+        return courseRepository
+            .findAll()
+            .map {
+                CourseDto(it.id, it.name, it.category)
+            }
+    }
 }
