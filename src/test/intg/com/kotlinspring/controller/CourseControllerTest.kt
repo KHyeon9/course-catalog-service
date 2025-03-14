@@ -1,6 +1,7 @@
 package com.kotlinspring.controller
 
 import com.kotlinspring.dto.CourseDto
+import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
 import com.kotlinspring.util.courseEntityList
 import org.junit.jupiter.api.Assertions
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -66,5 +68,58 @@ class CourseControllerTest {
 
         println("courseDtos = $courseDtos")
         Assertions.assertEquals(3, courseDtos!!.size)
+    }
+
+    @Test
+    fun updateCourse() {
+        // 조회시 반환할 course entity를 repository에 저장
+        val course = Course(
+            null,
+            "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
+            "Development"
+        )
+        courseRepository.save(course) // 저장으로 id가 채워짐
+
+        // 수정할 course dto
+        val updateCourseDto = CourseDto(
+            null,
+            "Spring boot와 Kotlin을 사용해서 Restful API 만들기2",
+            "Development"
+        )
+
+        // 수정 uri 호출
+        val updateCourse = webTestClient
+            .put()
+            .uri("/v1/courses/{courseId}", course.id)
+            .bodyValue(updateCourseDto) // 수정한 dto body에 값 추가
+            .exchange() // 호출
+            .expectStatus().isOk
+            .expectBody(CourseDto::class.java)
+            .returnResult() // 응답의 전체를 가져옴
+            .responseBody
+
+        assertEquals(
+                "Spring boot와 Kotlin을 사용해서 Restful API 만들기2",
+                updateCourse!!.name
+            )
+    }
+
+    @Test
+    fun deleteCourse() {
+        // 조회시 반환할 course entity를 repository에 저장
+        val course = Course(
+            null,
+            "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
+            "Development"
+        )
+        courseRepository.save(course) // 저장으로 id가 채워짐
+
+        // 수정 uri 호출
+        val updateCourse = webTestClient
+            .delete()
+            .uri("/v1/courses/{courseId}", course.id)
+            .exchange() // 호출
+            .expectStatus().isNoContent // 삭제시 상태가 no content인지 확인
+
     }
 }
