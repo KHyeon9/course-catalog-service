@@ -2,7 +2,7 @@ package com.kotlinspring.service
 
 import com.kotlinspring.dto.CourseDto
 import com.kotlinspring.entity.Course
-import com.kotlinspring.exceprion.CourseNotFoundException
+import com.kotlinspring.exception.CourseNotFoundException
 import com.kotlinspring.repository.CourseRepository
 import mu.KLogging
 import org.springframework.stereotype.Service
