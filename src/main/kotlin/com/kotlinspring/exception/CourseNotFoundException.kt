@@ -1,3 +1,3 @@
-package com.kotlinspring.exceprion
+package com.kotlinspring.exception
 
 class CourseNotFoundException(message: String) : RuntimeException(message)
