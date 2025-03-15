@@ -40,7 +40,7 @@ class CourseControllerUnitTest {
             courseServiceMockk.addCourse(any())
         } returns courseDto(id = 1)
 
-        val saveCourseDto = webTestClient
+        val response = webTestClient
             .post()
             .uri("/v1/courses")
             .bodyValue(courseDto) // body의 값을 추가
@@ -51,8 +51,64 @@ class CourseControllerUnitTest {
             .responseBody // 응답의 위에 선언한 객체(CourseDto)만 가져옴
 
         Assertions.assertTrue {
-            saveCourseDto!!.id != null // dto가 존재하며 id가 null이 아니면 true
+            response!!.id != null // dto가 존재하며 id가 null이 아니면 true
         }
+    }
+
+    @Test
+    fun addCourse_validation() {
+        val courseDto = CourseDto(
+            null,
+            "",
+            ""
+        )
+
+        // 서비스 메서드가 호출할 때, 반환하는 값 설정
+        every {
+            courseServiceMockk.addCourse(any())
+        } returns courseDto(id = 1)
+
+        val response = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDto) // body의 값을 추가
+            .exchange() // 호출
+            .expectStatus().isBadRequest // BadRequest가 뜨는지 확인
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        assertEquals(
+            "courseDto.category는 비어있으면 안됩니다., courseDto.name는 비어있으면 안됩니다.",
+            response
+        )
+    }
+
+    @Test
+    fun addCourse_runtimeException() {
+        val courseDto =  CourseDto(
+            null,
+            "Spring과 Kotlin을 이용한 Restfull API 빌드",
+            "Development"
+        )
+        val errorMessage = "예기치 않은 에러 발생"
+
+        // 서비스 메서드가 호출할 때, 반환하는 값 설정
+        every {
+            courseServiceMockk.addCourse(any())
+        } throws RuntimeException(errorMessage)
+
+        val response = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDto) // body의 값을 추가
+            .exchange() // 호출
+            .expectStatus().is5xxServerError // 서버 에러인지 확인
+            .expectBody(String::class.java)
+            .returnResult() // 응답의 전체를 가져옴
+            .responseBody // 응답의 위에 선언한 객체(CourseDto)만 가져옴
+
+        assertEquals(errorMessage, response)
     }
 
     @Test
