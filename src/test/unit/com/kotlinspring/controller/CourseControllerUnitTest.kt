@@ -2,36 +2,30 @@ package com.kotlinspring.controller
 
 import com.kotlinspring.dto.CourseDto
 import com.kotlinspring.entity.Course
-import com.kotlinspring.repository.CourseRepository
-import com.kotlinspring.util.courseEntityList
+import com.kotlinspring.service.CourseService
+import com.kotlinspring.util.courseDto
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.reactive.server.WebTestClient
 import kotlin.test.assertEquals
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@WebMvcTest(controllers = [CourseController::class])
 @AutoConfigureWebTestClient
-class CourseControllerTest {
+class CourseControllerUnitTest {
 
     @Autowired
     lateinit var webTestClient: WebTestClient
 
-    @Autowired
-    lateinit var courseRepository: CourseRepository
-
-    // 모든 코스 조회 테스트를 위한 셋업
-    @BeforeEach
-    fun setUp() {
-        courseRepository.deleteAll()
-        val courses = courseEntityList() // util에 만든 entity 가져오기
-        courseRepository.saveAll(courses)
-    }
+    // service 단을 mock으로 만듦
+    @MockkBean
+    lateinit var courseServiceMockk: CourseService
 
     @Test
     fun addCourse() {
@@ -40,6 +34,12 @@ class CourseControllerTest {
             "Spring과 Kotlin을 이용한 Restfull API 빌드",
             "Development"
         )
+
+        // 서비스 메서드가 호출할 때, 반환하는 값 설정
+        every {
+            courseServiceMockk.addCourse(any())
+        } returns courseDto(id = 1)
+
         val saveCourseDto = webTestClient
             .post()
             .uri("/v1/courses")
@@ -57,6 +57,15 @@ class CourseControllerTest {
 
     @Test
     fun retrieveAllCourses() {
+        every {
+            courseServiceMockk.retrieveCourses()
+        }.returnsMany(
+            listOf(
+                courseDto(id = 1),
+                courseDto(id = 2, name = "Spring boot와 Kotlin을 사용해서 Reactive Microservices 만들기"),
+            )
+        )
+
         val courseDtos = webTestClient
             .get()
             .uri("/v1/courses")
@@ -67,7 +76,7 @@ class CourseControllerTest {
             .responseBody
 
         println("courseDtos = $courseDtos")
-        Assertions.assertEquals(3, courseDtos!!.size)
+        Assertions.assertEquals(2, courseDtos!!.size)
     }
 
     @Test
@@ -78,7 +87,13 @@ class CourseControllerTest {
             "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
             "Development"
         )
-        courseRepository.save(course) // 저장으로 id가 채워짐
+
+        every {
+            courseServiceMockk.updateCourse(any(), any())
+        } returns courseDto(
+            id = 100,
+            name = "Spring boot와 Kotlin을 사용해서 Restful API 만들기2"
+        )
 
         // 수정할 course dto
         val updateCourseDto = CourseDto(
@@ -90,7 +105,7 @@ class CourseControllerTest {
         // 수정 uri 호출
         val updateCourse = webTestClient
             .put()
-            .uri("/v1/courses/{courseId}", course.id)
+            .uri("/v1/courses/{courseId}", 100)
             .bodyValue(updateCourseDto) // 수정한 dto body에 값 추가
             .exchange() // 호출
             .expectStatus().isOk
@@ -99,25 +114,19 @@ class CourseControllerTest {
             .responseBody
 
         assertEquals(
-                "Spring boot와 Kotlin을 사용해서 Restful API 만들기2",
-                updateCourse!!.name
-            )
+            "Spring boot와 Kotlin을 사용해서 Restful API 만들기2",
+            updateCourse!!.name
+        )
     }
 
     @Test
     fun deleteCourse() {
-        // 조회시 반환할 course entity를 repository에 저장
-        val course = Course(
-            null,
-            "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
-            "Development"
-        )
-        courseRepository.save(course) // 저장으로 id가 채워짐
+        every { courseServiceMockk.deleteCourse(any()) } just runs // 실행하고 아무것도 반환하지 않음
 
         // 수정 uri 호출
         val updateCourse = webTestClient
             .delete()
-            .uri("/v1/courses/{courseId}", course.id)
+            .uri("/v1/courses/{courseId}", 100)
             .exchange() // 호출
             .expectStatus().isNoContent // 삭제시 상태가 no content인지 확인
 
