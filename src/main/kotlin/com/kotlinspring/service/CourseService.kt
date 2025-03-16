@@ -29,9 +29,13 @@ class CourseService(
         }
     }
 
-    fun retrieveCourses(): List<CourseDto> {
-        return courseRepository
-            .findAll()
+    fun retrieveCourses(courseName: String?): List<CourseDto> {
+        // courseName이 null이 아닌경우 검색하고 null인 경우 모든 값을 가져옴
+        val courses = courseName?.let {
+            courseRepository.findByNameContaining(courseName)
+        } ?: courseRepository.findAll()
+
+        return courses
             .map {
                 CourseDto(it.id, it.name, it.category)
             }
