@@ -7,19 +7,19 @@ import com.kotlinspring.entity.Course
 fun courseEntityList() = listOf(
     Course(
         null,
-        "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
+        "SpringBoot와 Kotlin을 사용해서 Restful API 만들기",
         "Development"
     ),
     Course(
         null,
-        "Spring boot와 Kotlin을 사용해서 Reactive Microservices 만들기",
+        "SpringBoot와 Kotlin을 사용해서 Reactive Microservices 만들기",
         "Development"
     ),
     Course(
         null,
-        "Spring boot와 Kotlin을 사용해서 Junit5 test 만들기",
+        "SpringBoot와 Kotlin을 사용해서 Junit5 test 만들기",
         "Development"
-    )
+    ),
 )
 
 fun courseDto(
