@@ -21,7 +21,11 @@ class CourseController(val courseService : CourseService) {
 
     // 모든 코스 조회
     @GetMapping
-    fun retrieveAllCourses() : List<CourseDto> = courseService.retrieveCourses()
+    fun retrieveAllCourses(
+        // courseName은 필수가 아님 즉, 값이 존재하면 사용
+        @RequestParam("course_name", required = false) courseName: String?
+    ) : List<CourseDto>
+    = courseService.retrieveCourses(courseName)
 
     // 코스 수정
     @PutMapping("/{course_id}")
