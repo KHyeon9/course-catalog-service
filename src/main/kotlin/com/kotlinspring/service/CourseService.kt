@@ -23,7 +23,6 @@ class CourseService(
         courseRepository.save(courseEntity)
         logger.info("저장된 course : $courseEntity")
 
-
         return courseEntity.let {
             CourseDto(it.id, it.name, it.category)
         }
