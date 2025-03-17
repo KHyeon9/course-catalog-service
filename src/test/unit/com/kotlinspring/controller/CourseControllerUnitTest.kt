@@ -32,7 +32,8 @@ class CourseControllerUnitTest {
         val courseDto = CourseDto(
             null,
             "Spring과 Kotlin을 이용한 Restfull API 빌드",
-            "Development"
+            "Development",
+            1
         )
 
         // 서비스 메서드가 호출할 때, 반환하는 값 설정
@@ -60,7 +61,8 @@ class CourseControllerUnitTest {
         val courseDto = CourseDto(
             null,
             "",
-            ""
+            "",
+            1
         )
 
         // 서비스 메서드가 호출할 때, 반환하는 값 설정
@@ -89,7 +91,8 @@ class CourseControllerUnitTest {
         val courseDto =  CourseDto(
             null,
             "Spring과 Kotlin을 이용한 Restfull API 빌드",
-            "Development"
+            "Development",
+            1
         )
         val errorMessage = "예기치 않은 에러 발생"
 
