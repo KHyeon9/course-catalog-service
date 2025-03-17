@@ -3,6 +3,7 @@ package com.kotlinspring.controller
 import com.kotlinspring.dto.CourseDto
 import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
+import com.kotlinspring.repository.InstructorRepository
 import com.kotlinspring.util.courseEntityList
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -18,7 +19,7 @@ import kotlin.test.assertEquals
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-class CourseControllerTest {
+class CourseControllerIntgTest {
 
     @Autowired
     lateinit var webTestClient: WebTestClient
