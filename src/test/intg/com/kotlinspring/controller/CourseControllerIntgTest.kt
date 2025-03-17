@@ -5,6 +5,7 @@ import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
 import com.kotlinspring.repository.InstructorRepository
 import com.kotlinspring.util.courseEntityList
+import com.kotlinspring.util.instructorEntity
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,20 +28,36 @@ class CourseControllerIntgTest {
     @Autowired
     lateinit var courseRepository: CourseRepository
 
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
+
+
+
     // 모든 코스 조회 테스트를 위한 셋업
     @BeforeEach
     fun setUp() {
         courseRepository.deleteAll()
-        val courses = courseEntityList() // util에 만든 entity 가져오기
+        instructorRepository.deleteAll()
+
+        // 강사 초기 데이터 셋팅
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+
+        // 코스 초기 데이터 셋팅
+        val courses = courseEntityList(instructor) // util에 만든 entity 가져오기
         courseRepository.saveAll(courses)
     }
 
     @Test
     fun addCourse() {
+        // 강사 조회
+        val instructor = instructorRepository.findAll().first()
+
         val courseDto = CourseDto(
             null,
             "Spring과 Kotlin을 이용한 Restfull API 빌드",
-            "Development"
+            "Development",
+            instructor.id
         )
         val saveCourseDto = webTestClient
             .post()
@@ -94,11 +111,15 @@ class CourseControllerIntgTest {
 
     @Test
     fun updateCourse() {
+        // 강사 조회
+        val instructor = instructorRepository.findAll().first()
+
         // 조회시 반환할 course entity를 repository에 저장
         val course = Course(
             null,
             "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
-            "Development"
+            "Development",
+            instructor
         )
         courseRepository.save(course) // 저장으로 id가 채워짐
 
@@ -106,7 +127,8 @@ class CourseControllerIntgTest {
         val updateCourseDto = CourseDto(
             null,
             "Spring boot와 Kotlin을 사용해서 Restful API 만들기2",
-            "Development"
+            "Development",
+            instructor.id
         )
 
         // 수정 uri 호출
@@ -128,11 +150,15 @@ class CourseControllerIntgTest {
 
     @Test
     fun deleteCourse() {
+        // 강사 조회
+        val instructor = instructorRepository.findAll().first()
+
         // 조회시 반환할 course entity를 repository에 저장
         val course = Course(
             null,
             "Spring boot와 Kotlin을 사용해서 Restful API 만들기",
-            "Development"
+            "Development",
+            instructor
         )
         courseRepository.save(course) // 저장으로 id가 채워짐
 
@@ -142,6 +168,5 @@ class CourseControllerIntgTest {
             .uri("/v1/courses/{courseId}", course.id)
             .exchange() // 호출
             .expectStatus().isNoContent // 삭제시 상태가 no content인지 확인
-
     }
 }

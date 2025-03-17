@@ -14,4 +14,9 @@ data class Course(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
     var instructor:Instructor? = null
-)
+) {
+    // 스택 오버플로우 에러를 방지하기 위해 instructor.id를 출력하도록 변경
+    override fun toString(): String {
+        return "Course(id=$id, name='$name', category='$category', instructor=${instructor!!.id})"
+    }
+}
