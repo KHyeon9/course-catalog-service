@@ -1,5 +1,6 @@
 package com.kotlinspring.exceptionhandler
 
+import com.kotlinspring.exception.InstructorNotValidException
 import mu.KLogging
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -44,6 +45,16 @@ class GlobalErrorHandler : ResponseEntityExceptionHandler() {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST) // 지금은 dto에 client가 잘못된 값을 주었으므로 badrequest error
             .body(errors.joinToString(", ")) // 배열을 join하여 []가 없도록 값을 반환
+    }
+
+    // 강사가 존재하지 않을 경우 발생하는 에러 핸들링
+    @ExceptionHandler(InstructorNotValidException::class)
+    fun handleInstructorNotValidExceptions(ex: InstructorNotValidException, request: WebRequest): ResponseEntity<Any> {
+        logger.error("Exception이 발생되었습니다 : ${ex.message}", ex)
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ex.message)
     }
 
     // 모든 에러 핸들러
