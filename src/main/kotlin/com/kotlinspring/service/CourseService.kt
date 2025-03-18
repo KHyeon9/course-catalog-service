@@ -44,7 +44,7 @@ class CourseService(
 
         return courses
             .map {
-                CourseDto(it.id, it.name, it.category)
+                CourseDto(it.id, it.name, it.category, it.instructor!!.id)
             }
     }
 
