@@ -3,18 +3,37 @@ spring:
     name: course-catalog-service
   # h2와 연결 셋팅
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5438/courses
+    username: postgres
+    password: postgres
+    #    url: jdbc:h2:mem:testdb
+    #    driver-class-name: org.h2.Driver
+    #    username: sa
+    #    password: password
   jpa:
-    database: h2
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect # postsql 사용할 것을 알림
     generate-ddl: true # kotlin 코드내의 entity를 스캔해 자동으로 테이블 생성
+    hibernate:
+      # prod환경에서는 사용하지 않음
+      ddl-auto: create-drop # 애플리케이션 실행 시 테이블을 생성(create) 하고, 종료 시 삭제(drop) 함
     show-sql: true # 콘솔에서 sql문을 보여줌
-  h2:
-    console:
-      enabled: true # 브라우저를 통해 h2 컨트롤 가능하도록 설정
+    #    database: h2
+    #    database-platform: org.hibernate.dialect.H2Dialect
+    #  h2:
+    #    console:
+    #      enabled: true # 브라우저를 통해 h2 컨트롤 가능하도록 설정
+    # LOB(Large Object) 타입을 사용할 때 발생할 수 있는 문제를 해결하는 설정
+    # PostgreSQL에서는 BLOB(Binary Large Object)나 CLOB(Character Large Object)을 저장할 때,
+    #트랜잭션 컨텍스트가 필요할 수 있음
+    #이 설정을 true로 하면 Hibernate가 트랜잭션 없이도 LOB 데이터를 저장 가능
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
 message: Hello from default profile
 
 #---
