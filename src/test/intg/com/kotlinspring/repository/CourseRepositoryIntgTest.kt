@@ -1,13 +1,16 @@
 package com.kotlinspring.repository
 
+import com.kotlinspring.util.PostgreSQLContainerInitializer
 import java.util.stream.Stream
 import com.kotlinspring.util.courseEntityList
+import com.kotlinspring.util.instructorEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
@@ -15,16 +18,29 @@ import kotlin.test.assertEquals
 // jpa 관련 테스트 설정만 로드 즉, db 계층만 테스트 가능하도록 해줌
 @DataJpaTest
 @ActiveProfiles("test")
-class CourseRepositoryIntgTest {
+// 기본적으로 H2 같은 임베디드 데이터베이스를 자동으로 설정하려고 하기 때문에
+// Spring Boot의 통합 테스트에서 데이터베이스 설정을 변경하지 않도록 하는 역할
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+class CourseRepositoryIntgTest : PostgreSQLContainerInitializer() { // postgresql관련 초기 셋팅 인스턴스를 가져옴
 
     @Autowired
     lateinit var courseRepository: CourseRepository
+
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
 
     // 모든 코스 조회 테스트를 위한 셋업
     @BeforeEach
     fun setUp() {
         courseRepository.deleteAll()
-        val courses = courseEntityList() // util에 만든 entity 가져오기
+        instructorRepository.deleteAll()
+
+        // 강사 초기 데이터 셋팅
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+
+        // 코스 초기 데이터 셋팅
+        val courses = courseEntityList(instructor) // util에 만든 entity 가져오기
         courseRepository.saveAll(courses)
     }
 
