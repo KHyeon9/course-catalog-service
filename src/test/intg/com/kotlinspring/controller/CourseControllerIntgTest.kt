@@ -4,6 +4,7 @@ import com.kotlinspring.dto.CourseDto
 import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
 import com.kotlinspring.repository.InstructorRepository
+import com.kotlinspring.util.PostgreSQLContainerInitializer
 import com.kotlinspring.util.courseEntityList
 import com.kotlinspring.util.instructorEntity
 import org.junit.jupiter.api.Assertions
@@ -13,14 +14,21 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.util.UriComponentsBuilder
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-class CourseControllerIntgTest {
+// @Testcontainers // postgresql로 바꾸면서 테스트 하기 위한 컨테이너 추가
+class CourseControllerIntgTest : PostgreSQLContainerInitializer() {
 
     @Autowired
     lateinit var webTestClient: WebTestClient
@@ -31,7 +39,24 @@ class CourseControllerIntgTest {
     @Autowired
     lateinit var instructorRepository: InstructorRepository
 
-
+    //    companion object {
+    //        // test를 위해 test container를 통해 postgresql db를 생성
+    //        @Container
+    //        val postgresDB = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgres:13-alpine")).apply {
+    //            withDatabaseName("testdb")
+    //            withUsername("postgres")
+    //            withPassword("secret")
+    //        }
+    //
+    //        // test container로 생성한 db를 연결
+    //        @JvmStatic
+    //        @DynamicPropertySource // 동적으로 속성 소스를 재정의
+    //        fun properties(registry: DynamicPropertyRegistry) {
+    //            registry.add("spring.datasource.url", postgresDB::getJdbcUrl)
+    //            registry.add("spring.datasource.username", postgresDB::getUsername)
+    //            registry.add("spring.datasource.password", postgresDB::getPassword)
+    //        }
+    //    }
 
     // 모든 코스 조회 테스트를 위한 셋업
     @BeforeEach
